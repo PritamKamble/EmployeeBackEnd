@@ -6,7 +6,7 @@ const empSchema = mongoose.Schema({
     lastName: { type: String, required: true },
     email: { type: String, required: true },
     gender: { type: String },
-    age: { type: String, required: true },
+    age: { type: String },
     dateOfBirth: { type: String },
     salary: { type: String },
     address: { type: String },
