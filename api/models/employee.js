@@ -5,14 +5,17 @@ const empSchema = mongoose.Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     email: { type: String, required: true },
-    gender: { type: String, required: true },
+    gender: { type: String },
     age: { type: String, required: true },
-    salary: { type: String, required: true },
-    address: { type: String, required: true },
-    contact: { type: String, required: true },
+    dateOfBirth: { type: String },
+    salary: { type: String },
+    address: { type: String },
+    contact: { type: String },
     hobbies: {},
-    state: { type: String, required: true },
-    city: { type: String, required: true },
+    techSkills: {},
+    state: { type: String },
+    city: { type: String },
+    zipCode: { type: Number },
     employeeImage: { type: String, required: true }
 });
 

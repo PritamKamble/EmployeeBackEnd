@@ -27,12 +27,15 @@ exports.emp_create_emp = (req, res, next) => {
         email: req.body.email,
         gender: req.body.gender,
         age: req.body.age,
+        dateOfBirth: req.body.dateOfBirth,
         salary: req.body.salary,
         address: req.body.address,
         contact: req.body.contact,
         hobbies: req.body.hobbies,
+        techSkills: req.body.techSkills,
         state: req.body.state,
         city: req.body.city,
+        zipCode: req.body.zipCode,
         employeeImage: (req.file ? req.file.path : "uploads/default-avatar.png")
     });
     emp.save()
@@ -77,36 +80,40 @@ exports.emp_get_emp = (req, res, next) => {
 exports.emp_update_emp = (req, res, next) => {
     const id = req.params.empId;
     updateOps = {
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        email: req.body.email,
-        gender: req.body.gender,
-        age: req.body.age,
-        salary: req.body.salary,
-        address: req.body.address,
-        contact: req.body.contact,
-        hobbies: req.body.hobbies,
-        state: req.body.state,
-        city: req.body.city
+        // firstName: req.body.firstName,
+        // lastName: req.body.lastName,
+        // email: req.body.email,
+        // gender: req.body.gender,
+        // age: req.body.age,
+        // salary: req.body.salary,
+        // address: req.body.address,
+        // contact: req.body.contact,
+        // hobbies: req.body.hobbies,
+        // state: req.body.state,
+        // city: req.body.city,
+        // employeeImage: (req.file?:)
     };
 
 
 
-    // updateOps['firstName'] = req.body.firstName;
-    // updateOps['lastName'] = req.body.lastName;
-    // updateOps['email'] = req.body.email;
-    // updateOps['gender'] = req.body.gender;
-    // updateOps['age'] = req.body.age;
-    // updateOps['salary'] = req.body.salary;
-    // updateOps['address'] = req.body.address;
-    // updateOps['contact'] = req.body.contact;
-    // updateOps['hobbies'] = req.body.hobbies;
-    // updateOps['state'] = req.body.state;
-    // updateOps['city'] = req.body.city;
+    updateOps['firstName'] = req.body.firstName;
+    updateOps['lastName'] = req.body.lastName;
+    updateOps['email'] = req.body.email;
+    updateOps['gender'] = req.body.gender;
+    updateOps['age'] = req.body.age;
+    updateOps['dateOfBirth'] = req.body.dateOfBirth;
+    updateOps['salary'] = req.body.salary;
+    updateOps['address'] = req.body.address;
+    updateOps['contact'] = req.body.contact;
+    updateOps['hobbies'] = req.body.hobbies;
+    updateOps['techSkills'] = req.body.techSkills;
+    updateOps['state'] = req.body.state;
+    updateOps['city'] = req.body.city;
+    updateOps['zipCode'] = req.body.zipCode;
 
-    // if (req.file) {
-    //     updateOps['employeeImage'] = req.file.path;
-    // }
+    if (req.file) {
+        updateOps['employeeImage'] = req.file.path;
+    }
 
 
     Emp.update({ _id: id }, { $set: updateOps })
