@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 
 
 const empRoutes = require("./api/routes/employee");
+const authRoutes = require("./api/routes/auth.js");
 
 mongoose.connect('mongodb+srv://node-shop:node-shop@node-shop-rest-slxeu.mongodb.net/test?retryWrites=true&w=majority',
     { useNewUrlParser: true });
@@ -31,6 +32,7 @@ app.use((req, res, next) => {
 
 // Routes which should handle requests
 app.use("/employee", empRoutes);
+app.use("/auth", authRoutes);
 
 app.use((req, res, next) => {
   const error = new Error("Not found");

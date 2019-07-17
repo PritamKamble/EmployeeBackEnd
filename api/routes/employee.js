@@ -33,14 +33,14 @@ const storage = multer.diskStorage({
   
 
 
-router.get("/", EmpController.emp_get_all);
+router.get("/", checkAuth, EmpController.emp_get_all);
 
-router.post("/", upload.single('employeeImage'), EmpController.emp_create_emp);
+router.post("/", checkAuth, upload.single('employeeImage'), EmpController.emp_create_emp);
 
-router.get("/:empId", EmpController.emp_get_emp);
+router.get("/:empId", checkAuth, EmpController.emp_get_emp);
 
-router.patch("/:empId", upload.single('employeeImage'), EmpController.emp_update_emp);
+router.patch("/:empId", checkAuth, upload.single('employeeImage'), EmpController.emp_update_emp);
 
-router.delete("/:empId", EmpController.emp_delete);
+router.delete("/:empId", checkAuth, EmpController.emp_delete);
 
 module.exports = router;
