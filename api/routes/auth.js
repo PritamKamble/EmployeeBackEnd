@@ -8,4 +8,8 @@ router.post("/register", multer().single(), AuthController.register);
 
 router.post('/login', multer().single(),AuthController.login);
 
+router.post('/reset', multer().single(),AuthController.reset);
+
+router.post('/reset/:id', multer().single(),AuthController.changePassword);
+
 module.exports = router;

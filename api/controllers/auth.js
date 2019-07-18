@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+
 
 
 exports.register = (req, res, next) => {
@@ -102,4 +105,81 @@ exports.login = (req, res, next) => {
                 error: err
             });
         });
+};
+
+exports.reset = (req, res, next) => {
+    User.find({ email: req.body.email })
+        .exec()
+        .then(user => {
+            if (user.length < 1) {
+                return res.status(401).json({
+                    message: "Mail doesn\'t Exist"
+                });
+            }
+
+            var algorithm = 'aes256'; // or any other algorithm supported by OpenSSL
+            var key = 'password';
+            var text = user[0]._id + 'time:' + new Date();
+            var cipher = crypto.createCipher(algorithm, key);
+            var encrypted = cipher.update(text, 'utf8', 'hex') + cipher.final('hex');
+
+            var transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: '7208436929.pk@gmail.com',
+                    pass: 'pritpk1234'
+                }
+            });
+            var mailOptions = {
+                from: '7208436929.pk@gmail.com',
+                to: req.body.email,
+                subject: 'Please reset your password',
+                text: 'http://localhost:4200/auth/reset/' + encrypted
+            };
+            transporter.sendMail(mailOptions, function (error, info) {
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                    res.status(201).json({
+                        res: 'Email Sent'
+                    });
+                }
+            });
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                error: err
+            });
+        });
+};
+
+exports.changePassword = (req, res, next) => {
+    var algorithm = 'aes256'; // or any other algorithm supported by OpenSSL
+    var key = 'password';
+    var decipher = crypto.createDecipher(algorithm, key);
+    var decrypted = decipher.update(req.params.id, 'hex', 'utf8') + decipher.final('utf8');
+
+
+    bcrypt.hash(req.body.pass, 10, (err, hash) => {
+        if (err) {
+            return res.status(500).json({
+                error: err
+            });
+        } else {
+            User.update({ _id: decrypted.split('time:')[0] }, { pass: hash })
+                .exec()
+                .then(result => {
+                    res.status(201).json({
+                        new: result
+                    });
+                })
+                .catch(err => {
+                    res.status(500).json({
+                        error: err
+                    });
+                });
+        }
+    });
 };
