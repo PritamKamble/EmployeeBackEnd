@@ -118,10 +118,13 @@ exports.reset = (req, res, next) => {
             }
 
             var algorithm = 'aes256'; // or any other algorithm supported by OpenSSL
-            var key = 'password';
+            var key = user[0].pass;
             var text = user[0]._id + 'time:' + new Date();
             var cipher = crypto.createCipher(algorithm, key);
             var encrypted = cipher.update(text, 'utf8', 'hex') + cipher.final('hex');
+
+            var finalChipher = crypto.createCipher('aes256', 'password');
+            var finalEncrypt = finalChipher.update(encrypted + 'email:' + user[0].email, 'utf8', 'hex') + finalChipher.final('hex');
 
             var transporter = nodemailer.createTransport({
                 service: 'gmail',
@@ -134,7 +137,7 @@ exports.reset = (req, res, next) => {
                 from: '7208436929.pk@gmail.com',
                 to: req.body.email,
                 subject: 'Please reset your password',
-                text: 'http://localhost:4200/auth/reset/' + encrypted
+                text: 'http://localhost:4200/auth/reset/' + finalEncrypt
             };
             transporter.sendMail(mailOptions, function (error, info) {
                 if (error) {
@@ -155,31 +158,67 @@ exports.reset = (req, res, next) => {
         });
 };
 
-exports.changePassword = (req, res, next) => {
+exports.changePassword = async(req, res, next) => {
+
     var algorithm = 'aes256'; // or any other algorithm supported by OpenSSL
     var key = 'password';
     var decipher = crypto.createDecipher(algorithm, key);
     var decrypted = decipher.update(req.params.id, 'hex', 'utf8') + decipher.final('utf8');
 
-
-    bcrypt.hash(req.body.pass, 10, (err, hash) => {
-        if (err) {
-            return res.status(500).json({
-                error: err
-            });
-        } else {
-            User.update({ _id: decrypted.split('time:')[0] }, { pass: hash })
-                .exec()
-                .then(result => {
-                    res.status(201).json({
-                        new: result
-                    });
-                })
-                .catch(err => {
-                    res.status(500).json({
-                        error: err
-                    });
+    var id = decrypted.split('email:')[0];
+    var email = decrypted.split('email:')[1];
+    console.log('email is', email);
+    console.log('id is', id);
+    
+    User.find({ email: email })
+        .exec()
+        .then(user => {
+            if (user.length < 1) {
+                return res.status(401).json({
+                    message: "Mail doesn\'t Exist"
                 });
-        }
-    });
+            }
+
+            console.log(user[0].pass);
+            
+            
+
+            var finalDecipher = crypto.createDecipher('aes256', user[0].pass);
+            var finalDecrypted = finalDecipher.update(id, 'hex', 'utf8') + finalDecipher.final('utf8');
+
+            console.log(new Date());
+            console.log(new Date(finalDecrypted.split('time:')[1]));
+            
+            
+            var t = (new Date().getTime() - new Date(finalDecrypted.split('time:')[1]).getTime());
+
+            // console.log(new Date(0, 0, 0, ));
+
+            // bcrypt.hash(req.body.pass, 10, (err, hash) => {
+            //     if (err) {
+            //         return res.status(500).json({
+            //             error: err
+            //         });
+            //     } else {
+            //         User.update({ _id: finalDecrypted.split('time:')[0] }, { pass: hash })
+            //             .exec()
+            //             .then(result => {
+            //                 res.status(201).json({
+            //                     new: result
+            //                 });
+            //             })
+            //             .catch(err => {
+            //                 res.status(500).json({
+            //                     error: err
+            //                 });
+            //             });
+            //     }
+            // });
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({
+                message: 'Link is Expired'
+            });
+        });
 };
